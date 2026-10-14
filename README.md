@@ -14,7 +14,7 @@ loop/stages/
 claude/commands/pipeline.md   Claude Code router          -> ~/.claude/commands/pipeline.md
 codex/skills/loop/            Codex router                 -> ~/.codex/skills/loop
 claude/CLAUDE.cloud.md        global instructions for cloud workspaces
-cloud/install-software.sh     Conductor Cloud Computer install script
+cloud/install-software.sh     Cloud Computer install script (run by the bootstrap below)
 install.sh                    creates the symlinks (safe to rerun)
 ```
 
@@ -61,9 +61,12 @@ adversarial subagent inherits Opus rather than Fable; Codex supplies the second 
 
 1. Under Cloud Computer → Environment, set `OPENAI_API_KEY`, `GSTACK_CODEX_MODEL=gpt-6-astra`
    and `GSTACK_EPHEMERAL=1`.
-2. Add this repo under Cloud Computer → Repositories, or make it public so the script can
-   clone it.
-3. Paste `cloud/install-software.sh` into Install software and choose Build computer.
+2. Paste this into Install software and choose Build computer:
+   ```bash
+   git clone https://github.com/tmwBuidls/agent-config.git "$HOME/agent-config"
+   bash "$HOME/agent-config/cloud/install-software.sh"
+   ```
 
-Stage file and router changes reach cloud workspaces through the pull above; gstack and
-Impeccable updates need a rebuild.
+The real script is `cloud/install-software.sh`, so edit it here, not in Conductor. Script
+changes and gstack or Impeccable updates take effect on the next build. Router and stage file
+changes reach existing cloud workspaces through the pull above.

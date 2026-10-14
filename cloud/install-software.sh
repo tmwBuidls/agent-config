@@ -1,11 +1,15 @@
-# Paste into Conductor → Settings → Organization → Cloud Computer → Install software,
-# then choose Build computer. It runs once per build, as bash with set -euo pipefail, from
-# the sandbox home directory. Every new cloud workspace starts from the finished build.
+#!/usr/bin/env bash
+# Conductor Cloud Computer install script. Don't paste this file; paste the bootstrap from
+# the README into Settings → Organization → Cloud Computer → Install software. The bootstrap
+# clones this repo and runs this script once per build, from the sandbox home directory.
+# Every new cloud workspace starts from the finished build.
 #
 # Set these under Cloud Computer → Environment first:
 #   OPENAI_API_KEY       Codex outside reviews (from 1Password; paste it in the UI yourself)
 #   GSTACK_CODEX_MODEL   gpt-6-astra
 #   GSTACK_EPHEMERAL     1   (gstack stops writing history to a disk that won't survive)
+set -euo pipefail
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Bun: gstack's setup refuses anything older than 1.3.3.
 curl -fsSL https://bun.sh/install | bash
@@ -28,14 +32,7 @@ G="$HOME/.claude/skills/gstack/bin"
 npx -y impeccable install
 bun --no-env-file run "$G/gstack-design-detect.ts" install --host claude
 
-# This repo: use the Cloud Computer's clone if it's one of the configured repositories,
-# otherwise clone it (works without credentials only if the repo is public).
-INSTALL=$(find "$HOME" -maxdepth 3 -name install.sh -path '*agent-config/*' -print -quit)
-if [ -z "$INSTALL" ]; then
-  git clone https://github.com/tmwBuidls/agent-config.git "$HOME/agent-config"
-  INSTALL="$HOME/agent-config/install.sh"
-fi
-bash "$INSTALL" --cloud
+bash "$REPO/install.sh" --cloud
 
 # Log Codex in from OPENAI_API_KEY unless it already is.
 if ! codex login status >/dev/null 2>&1 && [ -n "${OPENAI_API_KEY:-}" ]; then
