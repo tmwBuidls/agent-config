@@ -10,6 +10,7 @@
 #   GSTACK_CODEX_MODEL   gpt-6-astra
 #   GSTACK_EPHEMERAL     1   (gstack stops writing history to a disk that won't survive)
 #   GBRAIN_URL, GBRAIN_CC_TOKEN, GBRAIN_CX_TOKEN   brain address + logins, read at runtime
+#   EXECUTOR_URL, EXECUTOR_API_KEY                 Executor address + API key, read at runtime
 set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -41,5 +42,5 @@ if ! codex login status >/dev/null 2>&1 && [ -n "${OPENAI_API_KEY:-}" ]; then
   "$G/gstack-codex-login"
 fi
 
-# Brain (gbrain MCP) for Claude Code and Codex, from the GBRAIN_* variables.
-bash "$REPO/cloud/connect-gbrain.sh"
+# Remote MCP servers (gbrain, Executor) for Claude Code and Codex, from their variables.
+bash "$REPO/cloud/connect-mcp.sh" --build
