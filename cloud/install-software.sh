@@ -8,6 +8,7 @@
 #   OPENAI_API_KEY       Codex outside reviews (from 1Password; paste it in the UI yourself)
 #   GSTACK_CODEX_MODEL   gpt-6-astra
 #   GSTACK_EPHEMERAL     1   (gstack stops writing history to a disk that won't survive)
+#   GBRAIN_URL, GBRAIN_CC_TOKEN, GBRAIN_CX_TOKEN   brain connection (see connect-gbrain.sh)
 set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
@@ -38,3 +39,6 @@ bash "$REPO/install.sh" --cloud
 if ! codex login status >/dev/null 2>&1 && [ -n "${OPENAI_API_KEY:-}" ]; then
   "$G/gstack-codex-login"
 fi
+
+# Brain (gbrain MCP) for Claude Code and Codex, from the GBRAIN_* variables.
+bash "$REPO/cloud/connect-gbrain.sh"

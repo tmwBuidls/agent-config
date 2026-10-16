@@ -15,6 +15,7 @@ claude/commands/pipeline.md   Claude Code router          -> ~/.claude/commands/
 codex/skills/loop/            Codex router                 -> ~/.codex/skills/loop
 claude/CLAUDE.cloud.md        global instructions for cloud workspaces
 cloud/install-software.sh     Cloud Computer install script (run by the bootstrap below)
+cloud/connect-gbrain.sh       connects Claude Code + Codex to the brain from GBRAIN_* env vars
 install.sh                    creates the symlinks (safe to rerun)
 ```
 
@@ -60,7 +61,9 @@ adversarial subagent inherits Opus rather than Fable; Codex supplies the second 
 ## Cloud setup
 
 1. Under Cloud Computer → Environment, set `OPENAI_API_KEY`, `GSTACK_CODEX_MODEL=gpt-6-astra`
-   and `GSTACK_EPHEMERAL=1`.
+   and `GSTACK_EPHEMERAL=1`. For the brain, also set `GBRAIN_URL` (the brain host's `/mcp`
+   URL), `GBRAIN_CC_TOKEN` (Claude Code login) and `GBRAIN_CX_TOKEN` (Codex login). Never
+   commit these; this repo is public.
 2. Paste this into Install software and choose Build computer:
    ```bash
    git clone https://github.com/tmwBuidls/agent-config.git "$HOME/agent-config"
@@ -70,3 +73,10 @@ adversarial subagent inherits Opus rather than Fable; Codex supplies the second 
 The real script is `cloud/install-software.sh`, so edit it here, not in Conductor. Script
 changes and gstack or Impeccable updates take effect on the next build. Router and stage file
 changes reach existing cloud workspaces through the pull above.
+
+## Brain
+
+`cloud/connect-gbrain.sh` registers the `gbrain` MCP server for Claude Code and Codex from the
+`GBRAIN_*` variables, then checks each login works (look for `login check HTTP 200` in the
+build log). Brain logins can read the main brain and gstack but only write to gstack. On the
+Mac, export the same three variables and run `bash ~/.agent-config/cloud/connect-gbrain.sh`.
