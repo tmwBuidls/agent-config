@@ -15,7 +15,7 @@ claude/commands/pipeline.md   Claude Code router          -> ~/.claude/commands/
 codex/skills/loop/            Codex router                 -> ~/.codex/skills/loop
 claude/CLAUDE.cloud.md        global instructions for cloud workspaces
 cloud/install-software.sh     Cloud Computer install script (run by the bootstrap below)
-cloud/connect-gbrain.sh       connects Claude Code + Codex to the brain from GBRAIN_* env vars
+cloud/connect-mcp.sh          connects Claude Code + Codex to gbrain and Executor from env vars
 install.sh                    creates the symlinks (safe to rerun)
 ```
 
@@ -62,24 +62,31 @@ adversarial subagent inherits Opus rather than Fable; Codex supplies the second 
 
 1. Under Cloud Computer → Environment, set `OPENAI_API_KEY`, `GSTACK_CODEX_MODEL=gpt-6-astra`
    and `GSTACK_EPHEMERAL=1`. For the brain, also set `GBRAIN_URL` (its `/mcp` address), `GBRAIN_CC_TOKEN` (Claude
-   Code login) and `GBRAIN_CX_TOKEN` (Codex login). Never commit these; this repo is public.
+   Code login) and `GBRAIN_CX_TOKEN` (Codex login). For Executor, set `EXECUTOR_URL` (its `/mcp`
+   address) and `EXECUTOR_API_KEY` (an API key from Executor's settings; both agents send it as
+   a Bearer token). Never commit these; this repo is public.
 2. Paste this into Install software and choose Build computer:
    ```bash
-   git clone https://github.com/tmwBuidls/agent-config.git "$HOME/agent-config"
-   bash "$HOME/agent-config/cloud/install-software.sh"
+   D="$HOME/.agent-config"
+   [ -d "$D/.git" ] || git clone https://github.com/tmwBuidls/agent-config.git "$D"
+   bash "$D/cloud/install-software.sh"
    ```
 
-The real script is `cloud/install-software.sh`, so edit it here, not in Conductor. Script
+Conductor clones every repo in the organization to `~/<repo>` before Install software runs, so
+the bootstrap uses its own clone at `~/.agent-config` (the path the router pulls from) and never
+touches Conductor's checkout, which a cloud workspace on this repo would be editing. The real script is `cloud/install-software.sh`, so edit it here, not in Conductor. Script
 changes and gstack or Impeccable updates take effect on the next build. Router and stage file
 changes reach existing cloud workspaces through the pull above.
 
-## Brain
+## Remote MCP servers
 
-`cloud/connect-gbrain.sh` registers the `gbrain` MCP server for Claude Code and Codex. Conductor
-only passes Environment variables to workspaces at runtime, not to the build, so Claude Code
-is registered by variable *name* (it expands `${GBRAIN_URL}` and `${GBRAIN_CC_TOKEN}` when it
+`cloud/connect-mcp.sh` registers the `gbrain` and `executor` MCP servers for Claude Code and
+Codex; add another server with one line in its `SERVERS` list. Conductor only passes
+Environment variables to workspaces at runtime, not to the build, so Claude Code is registered
+by variable *name* (it expands `${GBRAIN_URL}`, `${EXECUTOR_API_KEY}` and so on when it
 starts). Codex can't expand a variable in its URL, so the script installs a shell hook and a
-Claude Code SessionStart hook that run `connect-gbrain.sh --runtime` to register Codex once the
+Claude Code SessionStart hook that run `connect-mcp.sh --runtime` to register Codex once the
 variables exist. Expect `login not in this environment` lines in the build log. Brain logins
-read the main brain and gstack but only write to gstack. On the Mac, export the three
-variables in your shell profile and run `bash ~/.agent-config/cloud/connect-gbrain.sh`.
+read the main brain and gstack but only write to gstack. On the Mac, export the variables in
+your shell profile and run `bash ~/.agent-config/cloud/connect-mcp.sh`; servers whose URL
+isn't set are left alone, so an existing OAuth login to Executor survives.
