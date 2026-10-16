@@ -8,7 +8,7 @@
 #   OPENAI_API_KEY       Codex outside reviews (from 1Password; paste it in the UI yourself)
 #   GSTACK_CODEX_MODEL   gpt-6-astra
 #   GSTACK_EPHEMERAL     1   (gstack stops writing history to a disk that won't survive)
-#   GBRAIN_URL, GBRAIN_CC_TOKEN, GBRAIN_CX_TOKEN   brain connection (see connect-gbrain.sh)
+#   GBRAIN_URL, GBRAIN_CC_TOKEN, GBRAIN_CX_TOKEN   brain address + logins, read at runtime
 set -euo pipefail
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 

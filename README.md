@@ -61,9 +61,8 @@ adversarial subagent inherits Opus rather than Fable; Codex supplies the second 
 ## Cloud setup
 
 1. Under Cloud Computer → Environment, set `OPENAI_API_KEY`, `GSTACK_CODEX_MODEL=gpt-6-astra`
-   and `GSTACK_EPHEMERAL=1`. For the brain, also set `GBRAIN_URL` (the brain host's `/mcp`
-   URL), `GBRAIN_CC_TOKEN` (Claude Code login) and `GBRAIN_CX_TOKEN` (Codex login). Never
-   commit these; this repo is public.
+   and `GSTACK_EPHEMERAL=1`. For the brain, also set `GBRAIN_URL` (its `/mcp` address), `GBRAIN_CC_TOKEN` (Claude
+   Code login) and `GBRAIN_CX_TOKEN` (Codex login). Never commit these; this repo is public.
 2. Paste this into Install software and choose Build computer:
    ```bash
    git clone https://github.com/tmwBuidls/agent-config.git "$HOME/agent-config"
@@ -76,7 +75,11 @@ changes reach existing cloud workspaces through the pull above.
 
 ## Brain
 
-`cloud/connect-gbrain.sh` registers the `gbrain` MCP server for Claude Code and Codex from the
-`GBRAIN_*` variables, then checks each login works (look for `login check HTTP 200` in the
-build log). Brain logins can read the main brain and gstack but only write to gstack. On the
-Mac, export the same three variables and run `bash ~/.agent-config/cloud/connect-gbrain.sh`.
+`cloud/connect-gbrain.sh` registers the `gbrain` MCP server for Claude Code and Codex. Conductor
+only passes Environment variables to workspaces at runtime, not to the build, so Claude Code
+is registered by variable *name* (it expands `${GBRAIN_URL}` and `${GBRAIN_CC_TOKEN}` when it
+starts). Codex can't expand a variable in its URL, so the script installs a shell hook and a
+Claude Code SessionStart hook that run `connect-gbrain.sh --runtime` to register Codex once the
+variables exist. Expect `login not in this environment` lines in the build log. Brain logins
+read the main brain and gstack but only write to gstack. On the Mac, export the three
+variables in your shell profile and run `bash ~/.agent-config/cloud/connect-gbrain.sh`.
