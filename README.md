@@ -65,11 +65,14 @@ adversarial subagent inherits Opus rather than Fable; Codex supplies the second 
    Code login) and `GBRAIN_CX_TOKEN` (Codex login). Never commit these; this repo is public.
 2. Paste this into Install software and choose Build computer:
    ```bash
-   git clone https://github.com/tmwBuidls/agent-config.git "$HOME/agent-config"
-   bash "$HOME/agent-config/cloud/install-software.sh"
+   D="$HOME/.agent-config"
+   [ -d "$D/.git" ] || git clone https://github.com/tmwBuidls/agent-config.git "$D"
+   bash "$D/cloud/install-software.sh"
    ```
 
-The real script is `cloud/install-software.sh`, so edit it here, not in Conductor. Script
+Conductor clones every repo in the organization to `~/<repo>` before Install software runs, so
+the bootstrap uses its own clone at `~/.agent-config` (the path the router pulls from) and never
+touches Conductor's checkout, which a cloud workspace on this repo would be editing. The real script is `cloud/install-software.sh`, so edit it here, not in Conductor. Script
 changes and gstack or Impeccable updates take effect on the next build. Router and stage file
 changes reach existing cloud workspaces through the pull above.
 

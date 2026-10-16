@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Conductor Cloud Computer install script. Don't paste this file; paste the bootstrap from
 # the README into Settings → Organization → Cloud Computer → Install software. The bootstrap
-# clones this repo and runs this script once per build, from the sandbox home directory.
+# clones this repo to ~/.agent-config (not ~/agent-config, which Conductor has already cloned)
+# and runs this script once per build, from the sandbox home directory.
 # Every new cloud workspace starts from the finished build.
 #
 # Set these under Cloud Computer → Environment first:

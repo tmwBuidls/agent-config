@@ -12,6 +12,8 @@ BACKUP="$HOME/.agent-config-backup/$(date +%Y%m%d-%H%M%S)"
 
 link() {
   local src="$1" dst="$2"
+  # The cloud bootstrap clones straight to ~/.agent-config; don't back the repo up into itself.
+  if [ "$src" = "$dst" ]; then echo "already in place: $dst"; return; fi
   mkdir -p "$(dirname "$dst")"
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then
     mkdir -p "$BACKUP"
