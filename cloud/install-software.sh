@@ -31,8 +31,8 @@ G="$HOME/.claude/skills/gstack/bin"
 "$G/gstack-config" set routing_declined true
 
 # Impeccable: the skill, then gstack's checksum-verified detector engine.
-# If the first command stops to ask questions, check its --help for a non-interactive flag.
-npx -y impeccable install
+# --yes and --no-hooks keep it non-interactive (it otherwise prompts for harnesses, scope and a project hook).
+npx -y impeccable install --yes --global --no-hooks
 bun --no-env-file run "$G/gstack-design-detect.ts" install --host claude
 
 bash "$REPO/install.sh" --cloud
